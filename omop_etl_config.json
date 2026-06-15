@@ -1,0 +1,36 @@
+{
+    "source": {
+        "csv_path": "data/pima_node_A.csv",
+        "has_header": false,
+        "columns": ["pregnancies", "glucose", "blood_pressure", "skin_thickness", "insulin", "bmi", "pedigree", "age", "target"]
+    },
+    "target_db": {
+        "type": "sqlite",
+        "sqlite_path": "omop_diabetes.db",
+        "postgres": {
+            "host": "localhost",
+            "port": 5432,
+            "database": "omop",
+            "user": "postgres",
+            "password": ""
+        }
+    },
+    "etl": {
+        "batch_size": 1000,
+        "drop_existing_tables": false,
+        "pseudonymization_salt": "diabetes_fl_salt_2025"
+    },
+    "concept_mappings": {
+        "glucose": {"concept_id": 1554, "unit_concept_id": 8840},
+        "blood_pressure": {"concept_id": 8480, "unit_concept_id": 8876},
+        "bmi": {"concept_id": 3049187, "unit_concept_id": 9559},
+        "insulin": {"concept_id": 3013762, "unit_concept_id": 8534},
+        "skin_thickness": {"concept_id": 3016261, "unit_concept_id": 8576},
+        "pregnancies": {"concept_id": 4085704, "unit_concept_id": null},
+        "pedigree": {"concept_id": 4015197, "unit_concept_id": null}
+    },
+    "condition_concepts": {
+        "diabetes_mellitus_type_2": 44054006,
+        "condition_status_present": 32908
+    }
+}
