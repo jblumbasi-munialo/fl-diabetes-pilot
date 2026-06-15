@@ -1,0 +1,23 @@
+# prepare_validation_set.py (run on each node)
+import sqlite3
+import pandas as pd
+
+conn = sqlite3.connect('omop_diabetes.db')
+# Extract person data (age, gender)
+persons = pd.read_sql_query("""
+    SELECT person_id,
+           CAST(strftime('%Y', 'now') - year_of_birth AS INTEGER) AS age,
+           gender_concept_id
+    FROM person
+""", conn)
+
+# Create age groups
+persons['age_group'] = pd.cut(persons['age'], bins=[0,45,65,120], labels=['<45','45-65','>65'])
+# Map gender concept to binary (0/1 or 'M'/'F') – adjust concept IDs as needed
+gender_map = {0: 'unknown', 8532: 'female', 8507: 'male'}  # example concept IDs
+persons['gender'] = persons['gender_concept_id'].map(gender_map).fillna('unknown')
+
+# Load measurements and conditions (same as in training data)
+# Then merge to get features + target + sensitive attributes
+# Save to CSV or Fed‑BioMed dataset with name 'diabetes_val'
+# ...
