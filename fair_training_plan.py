@@ -93,3 +93,10 @@ class FairDiabetesTrainingPlan(TorchTrainingPlan):
                 "worst_group_accuracy": min(group_acc.values()) if group_acc else np.nan
             }
         return fairness_results
+    def fairness_evaluation(self, val_loader, sensitive_columns, output_path):
+        # ... existing code to compute fairness_results ...
+        # Save to JSON
+        import json
+        with open(output_path, 'w') as f:
+            json.dump(fairness_results, f, indent=2)
+        return fairness_results
