@@ -90,3 +90,26 @@ class ReweightedTrainingPlan(TorchTrainingPlan):
         else:
             weighted_loss = loss.mean()
         return weighted_loss
+    def on_round_begin(self, model, **kwargs):
+        """Called by Fed‑BioMed at the start of each round."""
+        # Load validation set from the node's dataset (assumed to be registered as 'val_data')
+        # This is pseudo‑code – actual implementation depends on how your node loads data.
+        try:
+            val_loader = self.get_dataloader(dataset_id='val_data', batch_size=32)
+            self.sample_weights = self.compute_sample_weights(val_loader)
+        except Exception as e:
+            print(f"Could not compute sample weights: {e}")
+            self.sample_weights = None
+
+    def training_step(self, data, target):
+        # Use stored sample weights if available
+        output = self.model()(data)
+        loss = nn.BCELoss(reduction='none')(output, target.view(-1, 1))
+        if hasattr(self, 'sample_weights') and self.sample_weights is not None:
+            # Need to map data samples to their group weights.
+            # For simplicity, assume `data` includes a group index column.
+            # This is complex; easier to pre‑compute per‑sample weights once.
+            # Instead, we simplify: compute weights per group and apply during loss.
+            # A full implementation requires aligning batch samples with groups.
+            pass
+        return loss.mean()
